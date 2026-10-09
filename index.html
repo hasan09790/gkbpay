@@ -3,93 +3,410 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lyuna Bro - Payment</title>
+<title>Deposit - GBK Pay</title>
 <style>
-*{box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#f4f4f9 0%,#e9e4f5 100%);display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;padding:20px}
-.container{background:#fff;padding:25px;border-radius:14px;box-shadow:0 8px 25px rgba(106,27,154,.15);width:100%;max-width:420px}
-.logo{font-size:24px;font-weight:bold;color:#6a1b9a;text-align:center;margin-bottom:5px;display:flex;justify-content:center;align-items:center;gap:8px}
-.logo span{font-size:30px}.subtitle{text-align:center;color:#888;font-size:13px;margin-bottom:20px}
-.form-group{margin-bottom:15px}label{display:block;margin-bottom:6px;font-weight:600;color:#333;font-size:14px}
-input,select{width:100%;padding:12px;border:1px solid #ccc;border-radius:8px;font-size:16px;outline:none}
-input:focus,select:focus{border-color:#6a1b9a}
-#paymentInfo{display:none;background:linear-gradient(135deg,#e2136e,#b00d56);color:#fff;padding:20px;border-radius:10px;margin-bottom:15px;text-align:center}
-#paymentInfo h3{margin-top:0;margin-bottom:10px;font-size:17px}
-.number-box{background:#fff;color:#e2136e;padding:12px;border-radius:6px;font-size:20px;font-weight:bold;letter-spacing:1px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.copy-btn{background:#b00d56;color:#fff;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;font-size:13px}
-.pay-btn{background:linear-gradient(135deg,#6a1b9a,#8e24aa);color:#fff;border:none;padding:15px;width:100%;border-radius:8px;font-size:18px;font-weight:bold;cursor:pointer;margin-top:5px}
-.pay-btn:disabled{background:#aaa;cursor:not-allowed}
-.note{font-size:12px;color:#777;margin-top:15px;text-align:center}
-.success-msg{display:none;background:#d4edda;color:#155724;padding:15px;border-radius:8px;margin-top:15px;text-align:center;font-weight:bold;font-size:15px}
-.error-msg{display:none;background:#f8d7da;color:#721c24;padding:12px;border-radius:8px;margin-top:10px;text-align:center;font-size:14px}
-.trx-hint{font-size:12px;color:#e2136e;margin-top:5px}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(135deg,#0d5c4a,#0f6330);min-height:100vh;display:flex;justify-content:center;padding:16px}
+.app{background:#fff;width:100%;max-width:440px;border-radius:16px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.4);margin-top:20px;height:fit-content}
+.top{background:linear-gradient(135deg,#0d5c4a,#0a4a3c);color:#fff;padding:18px 20px}
+.top-title{font-size:13px;color:#ffc107;font-weight:600;letter-spacing:1px}
+.top-amount{font-size:34px;font-weight:800;margin-top:4px;letter-spacing:.5px}
+.top-track{font-size:11px;color:#a5d6a7;margin-top:6px;font-family:monospace;word-break:break-all}
+
+/* Amount Section */
+.amount-section{padding:18px 20px 14px;background:#f8f9fa;border-bottom:1px solid #eee}
+.amount-label{font-size:13px;font-weight:800;color:#222;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.amount-label::before{content:"";width:4px;height:16px;background:#e53935;border-radius:2px}
+.amount-input-wrap{position:relative;margin-bottom:10px}
+.amount-input{width:100%;padding:14px 60px 14px 16px;border:2px solid #0d5c4a;border-radius:10px;font-size:22px;font-weight:800;color:#0d5c4a;outline:none;background:#fff;font-family:monospace;letter-spacing:1px}
+.amount-input:focus{border-color:#e53935;box-shadow:0 0 0 3px rgba(229,57,53,.1)}
+.amount-input::placeholder{color:#bbb;font-size:16px;font-weight:500}
+.taka-sign{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:20px;font-weight:800;color:#0d5c4a}
+.quick-amounts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.quick-btn{padding:10px 4px;border:1.5px solid #ddd;border-radius:8px;text-align:center;font-size:13px;font-weight:700;color:#222;background:#fff;cursor:pointer;transition:.15s}
+.quick-btn:active{transform:scale(.95)}
+.quick-btn.active{border-color:#e53935;color:#e53935;background:#fff5f5}
+.amount-hint{font-size:11px;color:#888;margin-top:8px}
+.amount-error{display:none;background:#ffebee;color:#c62828;padding:8px 12px;border-radius:6px;font-size:12px;font-weight:600;margin-top:8px;text-align:center}
+
+/* Method Selector */
+.method-section{padding:18px 20px 8px}
+.method-title{font-size:14px;font-weight:800;color:#222;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.method-title::before{content:"";width:4px;height:16px;background:#e53935;border-radius:2px}
+
+.method-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.method-option{border:2px solid #ddd;border-radius:12px;padding:14px 10px;background:#fff;cursor:pointer;text-align:center;transition:.2s;position:relative}
+.method-option:active{transform:scale(.97)}
+.method-option.active{border-color:#e53935;background:#fff8f8;box-shadow:0 4px 12px rgba(229,57,53,.15)}
+.method-option.active::after{content:"✓";position:absolute;top:6px;right:8px;color:#e53935;font-size:16px;font-weight:bold}
+
+.method-option .m-logo{width:60px;height:60px;margin:0 auto 8px;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.method-option .m-logo svg{width:100%;height:100%}
+.method-option .m-name{font-size:15px;font-weight:800;color:#222;letter-spacing:.3px}
+.method-option.active .m-name{color:#e53935}
+
+.selected-method-box{border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;color:#fff;margin-bottom:14px;box-shadow:0 4px 12px rgba(0,0,0,.15);background:linear-gradient(135deg,#e6159b,#c40f80);transition:.3s}
+.selected-method-box.nagad{background:linear-gradient(135deg,#f57c00,#e65100)}
+.selected-method-box.rocket{background:linear-gradient(135deg,#8e24aa,#6a1b9a)}
+.selected-method-box .sm-logo{width:50px;height:50px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.selected-method-box .sm-logo svg{width:100%;height:100%}
+.selected-method-box .sm-name{font-size:19px;font-weight:700}
+
+.number-box{background:#f8f9fa;border:1.5px dashed #0d5c4a;border-radius:10px;padding:14px;margin-bottom:8px}
+.number-label{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.number-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.number-value{font-size:20px;font-weight:800;color:#0d5c4a;letter-spacing:1px;font-family:monospace}
+.copy-btn{background:#0d5c4a;color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
+.copy-btn:active{transform:scale(.95)}
+.number-hint{font-size:11px;color:#e53935;font-weight:600;margin-top:8px}
+
+.trx-section{padding:14px 20px 20px}
+.trx-label{font-size:13px;font-weight:700;color:#222;margin-bottom:8px}
+.trx-label span{color:#e53935}
+.trx-input{width:100%;padding:14px;border:2px solid #e53935;border-radius:10px;font-size:15px;color:#222;outline:none;background:#fff;font-family:monospace;letter-spacing:1px}
+.trx-input::placeholder{color:#bbb;font-family:'Segoe UI',sans-serif;letter-spacing:0}
+.trx-input:focus{border-color:#0d5c4a;box-shadow:0 0 0 3px rgba(13,92,74,.1)}
+.trx-hint{font-size:11px;color:#888;margin-top:6px}
+.confirm-btn{width:100%;background:linear-gradient(135deg,#0d5c4a,#0f6330);color:#fff;border:none;padding:16px;border-radius:10px;font-size:17px;font-weight:800;cursor:pointer;margin-top:14px;transition:.2s}
+.confirm-btn:active{transform:scale(.98)}
+.confirm-btn:disabled{background:#aaa;cursor:not-allowed}
+
+.success{display:none;padding:30px 24px;text-align:center}
+.success-icon{width:80px;height:80px;background:#e8f5e9;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:44px;color:#0d5c4a;animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+.success h3{font-size:20px;color:#0d5c4a;margin-bottom:8px}
+.success p{color:#666;font-size:14px;line-height:1.6}
+.success .trx-show{background:#f8f9fa;padding:12px;border-radius:8px;margin-top:16px;font-family:monospace;font-size:13px;color:#222;word-break:break-all;text-align:left;white-space:pre-line}
+.error{display:none;background:#ffebee;color:#c62828;padding:12px;border-radius:8px;font-size:13px;font-weight:600;margin-top:12px;text-align:center}
+.timer-bar{background:#fff3cd;color:#856404;padding:10px;text-align:center;font-size:12px;font-weight:600;display:flex;justify-content:center;align-items:center;gap:6px}
+.timer-bar strong{color:#e53935;font-family:monospace;font-size:14px}
+.footer{text-align:center;padding:14px;font-size:11px;color:#999;border-top:1px solid #eee}
+.footer strong{color:#0d5c4a}
+
+/* কপি টোস্ট */
+.copy-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#0d5c4a;color:#fff;padding:12px 24px;border-radius:25px;font-size:14px;font-weight:600;opacity:0;transition:.3s;z-index:9999;box-shadow:0 8px 20px rgba(0,0,0,.3);white-space:nowrap;pointer-events:none}
+.copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
-<div class="container">
-<div class="logo"><span>∞</span> Lyuna Bro</div>
-<div class="subtitle">নিরাপদ ম্যানুয়াল পেমেন্ট সিস্টেম</div>
-<form id="paymentForm">
-<div class="form-group"><label for="amount">টাকার পরিমাণ (৳)</label><input type="number" id="amount" placeholder="যেমন: ৫০০" min="1" required></div>
-<div class="form-group"><label for="method">পেমেন্ট মাধ্যম সিলেক্ট করুন</label>
-<select id="method" required><option value="">-- সিলেক্ট করুন --</option><option value="bkash">📱 বিকাশ (bKash)</option><option value="nagad">📱 নগদ (Nagad)</option><option value="rocket">📱 রকেট (Rocket)</option></select></div>
-<div id="paymentInfo"><h3 id="methodTitle">বিকাশ (bKash) পেমেন্ট</h3><p>নিচের নাম্বারে টাকা Send Money করুন:</p>
-<div class="number-box"><span id="displayNumber">01748272047</span><button type="button" class="copy-btn" onclick="copyNumber()">কপি</button></div>
-<p>টাকা পাঠানোর পর নিচে TrxID লিখুন।</p></div>
-<div class="form-group" id="trxGroup" style="display:none"><label for="trxid">ট্রানজেকশন আইডি (TrxID)</label>
-<input type="text" id="trxid" placeholder="যেমন: 9F7A2B1C"><p class="trx-hint">* SMS-এ পাওয়া ট্রানজেকশন আইডি হুবহু লিখুন</p></div>
-<button type="submit" class="pay-btn" id="submitBtn">ভেরিফাই করুন</button>
-</form>
-<div id="successMsg" class="success-msg">✅ আপনার পেমেন্ট সফলভাবে জমা হয়েছে!<br><small>অ্যাডমিন যাচাই করে কনফার্ম করবে।</small></div>
-<div id="errorMsg" class="error-msg"></div>
-<p class="note">⚠️ কোনো অবস্থাতেই আপনার পিন বা OTP এখানে দেবেন না।<br>এটি একটি ম্যানুয়াল পেমেন্ট সিস্টেম।</p>
+<div class="app">
+  <div class="timer-bar" id="timerBar">⏱️ পেমেন্টের সময় বাকি: <strong id="timer">09:59</strong></div>
+
+  <div class="top">
+    <div class="top-title">GBK PAY • DEPOSIT</div>
+    <div class="top-amount" id="amountDisplay">৳ 0</div>
+    <div class="top-track" id="trackDisplay">Tracking: —</div>
+  </div>
+
+  <div class="amount-section">
+    <div class="amount-label">টাকার পরিমাণ লিখুন</div>
+    <div class="amount-input-wrap">
+      <input type="number" class="amount-input" id="amountInput" placeholder="0" min="10" max="100000" autocomplete="off">
+      <span class="taka-sign">৳</span>
+    </div>
+    <div class="quick-amounts">
+      <div class="quick-btn" onclick="setAmount(200, this)">200</div>
+      <div class="quick-btn" onclick="setAmount(500, this)">500</div>
+      <div class="quick-btn" onclick="setAmount(1000, this)">1000</div>
+      <div class="quick-btn" onclick="setAmount(5000, this)">5000</div>
+    </div>
+    <div class="amount-hint">💡 সর্বনিম্ন ৳10, সর্বোচ্চ ৳1,00,000</div>
+    <div class="amount-error" id="amountError"></div>
+  </div>
+
+  <div class="method-section">
+    <div class="method-title">পেমেন্ট মাধ্যম সিলেক্ট করুন</div>
+    
+    <div class="method-options">
+      <div class="method-option active" data-method="bkash" onclick="selectMethod('bkash', this)">
+        <div class="m-logo">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="20" fill="#e2136e"/><text x="50" y="42" text-anchor="middle" fill="#fff" font-family="Arial" font-size="14" font-weight="bold">bkash</text><path d="M28 60 L48 50 L46 62 L70 46 L60 70 L44 62 L42 74 Z" fill="#fff"/></svg>
+        </div>
+        <div class="m-name">বিকাশ</div>
+      </div>
+      <div class="method-option" data-method="nagad" onclick="selectMethod('nagad', this)">
+        <div class="m-logo">
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="20" fill="#f57c00"/><circle cx="50" cy="50" r="24" fill="#fff"/><text x="50" y="58" text-anchor="middle" fill="#e65100" font-family="Arial" font-size="22" font-weight="bold">ন</text></svg>
+        </div>
+        <div class="m-name">নগদ</div>
+      </div>
+    </div>
+
+    <div class="selected-method-box" id="selectedMethodBox">
+      <div class="sm-logo" id="smLogo"></div>
+      <div class="sm-name" id="smName">বিকাশ</div>
+    </div>
+
+    <div class="number-box">
+      <div class="number-label">Send Money নাম্বার</div>
+      <div class="number-row">
+        <span class="number-value" id="payNumber">01748272047</span>
+        <button class="copy-btn" onclick="copyNumber()">📋 কপি</button>
+      </div>
+      <div class="number-hint">⚠️ শুধুমাত্র Send Money করুন (Cash Out নয়)</div>
+    </div>
+  </div>
+
+  <div class="trx-section" id="trxSection">
+    <div class="trx-label">ক্যাশআউটের TrxID নাম্বারটি লিখুন <span>(প্রয়োজন)</span></div>
+    <input type="text" class="trx-input" id="trxid" placeholder="TrxID অবশ্যই পূর্ণ করতে হবে!" maxlength="30" autocomplete="off">
+    <div class="trx-hint">💡 SMS-এ পাওয়া ট্রানজেকশন আইডি হুবহু লিখুন</div>
+    <button type="button" class="confirm-btn" id="confirmBtn" onclick="submitPayment()">নিশ্চিত করুন</button>
+    <div class="error" id="errorMsg"></div>
+  </div>
+
+  <div class="success" id="successBox">
+    <div class="success-icon">✓</div>
+    <h3>পেমেন্ট সফল!</h3>
+    <p>আপনার পেমেন্ট সফলভাবে জমা হয়েছে।<br>অ্যাডমিন যাচাই করে কনফার্ম করবে।</p>
+    <div class="trx-show" id="successTrx"></div>
+  </div>
+
+  <div class="footer">🔒 সুরক্ষিত পেমেন্ট • <strong>GBK PAY</strong></div>
 </div>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore,collection,addDoc,serverTimestamp,query,where,getDocs }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig={
-apiKey: "AIzaSyAFs66aEkZi7chGoU6mRbdRQbzkJLLigvA",
-authDomain: "deposit-ce80a.firebaseapp.com",
-databaseURL: "https://deposit-ce80a-default-rtdb.firebaseio.com",
-projectId: "deposit-ce80a",
-storageBucket: "deposit-ce80a.firebasestorage.app",
-messagingSenderId: "535769317299",
-appId: "1:535769317299:web:557fa3ae6cd99a36f215c6"
+<!-- কপি টোস্ট -->
+<div class="copy-toast" id="copyToast"></div>
+
+<!-- Firebase Compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+/* ===== Firebase ===== */
+const firebaseConfig = {
+  apiKey: "AIzaSyAFs66aEkZi7chGoU6mRbdRQbzkJLLigvA",
+  authDomain: "deposit-ce80a.firebaseapp.com",
+  projectId: "deposit-ce80a",
+  storageBucket: "deposit-ce80a.firebasestorage.app",
+  messagingSenderId: "535769317299",
+  appId: "1:535769317299:web:557fa3ae6cd99a36f215c6"
 };
-const app=initializeApp(firebaseConfig),db=getFirestore(app);
-const methodSelect=document.getElementById('method');
-const paymentInfo=document.getElementById('paymentInfo');
-const trxGroup=document.getElementById('trxGroup');
-const methodTitle=document.getElementById('methodTitle');
-const displayNumber=document.getElementById('displayNumber');
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-methodSelect.addEventListener('change',function(){
-const method=this.value;
-if(method==='bkash'){paymentInfo.style.display='block';trxGroup.style.display='block';methodTitle.innerText='📱 বিকাশ (bKash) পেমেন্ট';displayNumber.innerText='01748272047'}
-else if(method==='nagad'){paymentInfo.style.display='block';trxGroup.style.display='block';methodTitle.innerText='📱 নগদ (Nagad) পেমেন্ট';displayNumber.innerText='01748272047'}
-else if(method==='rocket'){paymentInfo.style.display='block';trxGroup.style.display='block';methodTitle.innerText='📱 রকেট (Rocket) পেমেন্ট';displayNumber.innerText='017XXXXXXXXX'}
-else{paymentInfo.style.display='none';trxGroup.style.display='none'}
+/* ===== URL থেকে ডেটা ===== */
+const urlParams = new URLSearchParams(window.location.search);
+let amount = Number(urlParams.get('amount')) || 0;
+let method = urlParams.get('method') || 'bkash';
+const channel = urlParams.get('channel') || 'SEND MONEY VIP | GBKPAY';
+
+/* নাম্বার কনফিগ */
+const PAYMENT_NUMBERS = {
+  bkash:  '01748272047',
+  nagad:  '01748272047',
+  rocket: '01748272047'
+};
+
+const METHOD_INFO = {
+  bkash:  { name: 'বিকাশ', class: '',        logo: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="20" fill="#e2136e"/><text x="50" y="42" text-anchor="middle" fill="#fff" font-family="Arial" font-size="14" font-weight="bold">bkash</text><path d="M28 60 L48 50 L46 62 L70 46 L60 70 L44 62 L42 74 Z" fill="#fff"/></svg>' },
+  nagad:  { name: 'নগদ',   class: 'nagad',   logo: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="20" fill="#f57c00"/><circle cx="50" cy="50" r="24" fill="#fff"/><text x="50" y="58" text-anchor="middle" fill="#e65100" font-family="Arial" font-size="22" font-weight="bold">ন</text></svg>' },
+  rocket: { name: 'রকেট',  class: 'rocket',  logo: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="20" fill="#8e24aa"/><circle cx="50" cy="50" r="24" fill="#fff"/><text x="50" y="58" text-anchor="middle" fill="#8e24aa" font-family="Arial" font-size="22" font-weight="bold">R</text></svg>' }
+};
+
+/* ===== UI Init ===== */
+document.getElementById('trackDisplay').innerText = 'Tracking: ' + (urlParams.get('trackingNumber') || '—');
+
+const amountInput = document.getElementById('amountInput');
+if(amount > 0){
+  amountInput.value = amount;
+  updateAmountDisplay(amount);
+}
+
+amountInput.addEventListener('input', function(){
+  const val = this.value.trim();
+  if(val){
+    updateAmountDisplay(Number(val));
+    document.getElementById('amountError').style.display = 'none';
+  }else{
+    document.getElementById('amountDisplay').innerText = '৳ 0';
+  }
 });
 
-window.copyNumber=()=>{
-const n=displayNumber.innerText;
-navigator.clipboard.writeText(n).then(()=>alert('✅ নাম্বার কপি হয়েছে: '+n)).catch(()=>alert('কপি করা যায়নি। ম্যানুয়ালি কপি করুন।'))
+function updateAmountDisplay(val){
+  if(isNaN(val)) val = 0;
+  document.getElementById('amountDisplay').innerText = '৳ ' + val.toLocaleString('en-IN');
+}
+
+window.setAmount = function(val, el){
+  document.querySelectorAll('.quick-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  amountInput.value = val;
+  updateAmountDisplay(val);
+  document.getElementById('amountError').style.display = 'none';
 };
 
-document.getElementById('paymentForm').addEventListener('submit',async function(e){
-e.preventDefault();
-const submitBtn=document.getElementById('submitBtn'),errorMsg=document.getElementById('errorMsg'),successMsg=document.getElementById('successMsg');
-errorMsg.style.display='none';submitBtn.disabled=true;submitBtn.innerText='যাচাই করা হচ্ছে...';
-const amount=document.getElementById('amount').value.trim(),method=methodSelect.value,trxid=document.getElementById('trxid').value.trim().toUpperCase();
-if(!amount||!method||!trxid){errorMsg.innerText='সব তথ্য সঠিকভাবে পূরণ করুন।';errorMsg.style.display='block';submitBtn.disabled=false;submitBtn.innerText='ভেরিফাই করুন';return}
-try{
-const q=query(collection(db,"payments"),where("trxid","==",trxid)),s=await getDocs(q);
-if(!s.empty){errorMsg.innerText='❌ এই ট্রানজেকশন আইডি আগে ব্যবহার করা হয়েছে।';errorMsg.style.display='block';submitBtn.disabled=false;submitBtn.innerText='ভেরিফাই করুন';return}
-await addDoc(collection(db,"payments"),{amount,method,trxid,status:"pending",createdAt:serverTimestamp()});
-document.getElementById('paymentForm').style.display='none';successMsg.style.display='block'
-}catch(error){console.error(error);errorMsg.innerText='ডেটা সেভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।';errorMsg.style.display='block';submitBtn.disabled=false;submitBtn.innerText='ভেরিফাই করুন'}
+window.selectMethod = function(m, el){
+  method = m;
+  document.querySelectorAll('.method-option').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  updateMethodUI();
+};
+
+function updateMethodUI(){
+  const info = METHOD_INFO[method] || METHOD_INFO.bkash;
+  document.getElementById('smName').innerText = info.name;
+  document.getElementById('smLogo').innerHTML = info.logo;
+  document.getElementById('selectedMethodBox').className = 'selected-method-box ' + info.class;
+  document.getElementById('payNumber').innerText = PAYMENT_NUMBERS[method] || PAYMENT_NUMBERS.bkash;
+}
+
+if(method !== 'bkash'){
+  const targetEl = document.querySelector('.method-option[data-method="' + method + '"]');
+  if(targetEl){
+    document.querySelectorAll('.method-option').forEach(o=>o.classList.remove('active'));
+    targetEl.classList.add('active');
+  }
+}
+updateMethodUI();
+
+/* ============================================
+   ✅ কপি ফাংশন (সব ব্রাউজারে কাজ করবে)
+   ============================================ */
+window.copyNumber = function(){
+  const num = document.getElementById('payNumber').innerText.trim();
+
+  // পদ্ধতি ১: execCommand (HTTP, file:// সহ সব জায়গায় কাজ করে)
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = num;
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.width = '1px';
+    ta.style.height = '1px';
+    ta.style.opacity = '0';
+    ta.style.border = 'none';
+    ta.setAttribute('readonly', '');
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, 99999);
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+
+    if(ok){
+      showCopyToast('✅ নাম্বার কপি হয়েছে: ' + num);
+      return;
+    }
+  } catch(err) {
+    console.warn('execCommand failed:', err);
+  }
+
+  // পদ্ধতি ২: navigator.clipboard (HTTPS এর জন্য)
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(num).then(function(){
+      showCopyToast('✅ নাম্বার কপি হয়েছে: ' + num);
+    }).catch(function(){
+      manualCopy(num);
+    });
+  } else {
+    manualCopy(num);
+  }
+};
+
+/* ম্যানুয়াল কপি (শেষ উপায়) */
+function manualCopy(num){
+  prompt('নিচের নাম্বারটি ম্যানুয়ালি কপি করুন:', num);
+}
+
+/* সুন্দর টোস্ট মেসেজ */
+function showCopyToast(msg){
+  const t = document.getElementById('copyToast');
+  t.innerText = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){
+    t.classList.remove('show');
+  }, 2200);
+}
+
+/* ===== টাইমার ===== */
+let totalSeconds = 10 * 60;
+const timerEl = document.getElementById('timer');
+setInterval(function(){
+  if(totalSeconds <= 0){ timerEl.innerText = '00:00'; return; }
+  totalSeconds--;
+  var m = String(Math.floor(totalSeconds/60)).padStart(2,'0');
+  var s = String(totalSeconds%60).padStart(2,'0');
+  timerEl.innerText = m + ':' + s;
+}, 1000);
+
+/* ===== সাবমিট ===== */
+window.submitPayment = async function(){
+  const amountErr = document.getElementById('amountError');
+  const errEl = document.getElementById('errorMsg');
+  const btn = document.getElementById('confirmBtn');
+
+  errEl.style.display = 'none';
+  amountErr.style.display = 'none';
+
+  const finalAmount = Number(amountInput.value);
+  if(!finalAmount || finalAmount < 10){
+    amountErr.innerText = '⚠️ কমপক্ষে ৳10 দিন';
+    amountErr.style.display = 'block';
+    amountInput.focus();
+    return;
+  }
+  if(finalAmount > 100000){
+    amountErr.innerText = '⚠️ সর্বোচ্চ ৳1,00,000 দিন';
+    amountErr.style.display = 'block';
+    amountInput.focus();
+    return;
+  }
+
+  const trx = document.getElementById('trxid').value.trim().toUpperCase();
+  if(!trx || trx.length < 4){
+    errEl.innerText = '⚠️ সঠিক TrxID দিন (কমপক্ষে ৪ অক্ষর)';
+    errEl.style.display = 'block';
+    document.getElementById('trxid').focus();
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = 'যাচাই করা হচ্ছে...';
+
+  try{
+    const dupSnap = await db.collection('payments').where('trxid', '==', trx).get();
+    if(!dupSnap.empty){
+      errEl.innerText = '❌ এই TrxID আগে ব্যবহার করা হয়েছে!';
+      errEl.style.display = 'block';
+      btn.disabled = false; btn.innerText = 'নিশ্চিত করুন';
+      return;
+    }
+
+    await db.collection('payments').add({
+      trackingNumber: 'GBK' + Date.now().toString(36).toUpperCase(),
+      amount: finalAmount,
+      method: method,
+      channel: channel,
+      trxid: trx,
+      status: 'submitted',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    document.getElementById('trxSection').style.display = 'none';
+    document.querySelector('.amount-section').style.display = 'none';
+    document.querySelector('.method-section').style.display = 'none';
+    document.getElementById('timerBar').style.display = 'none';
+    document.getElementById('successBox').style.display = 'block';
+    document.getElementById('successTrx').innerText =
+      '💰 Amount: ৳' + finalAmount.toLocaleString('en-IN') +
+      '\n📝 TrxID: ' + trx +
+      '\n📱 Method: ' + METHOD_INFO[method].name;
+  }catch(e){
+    console.error('Firebase Error:', e);
+    errEl.innerText = '❌ ডেটা সেভ হয়নি: ' + e.message;
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.innerText = 'নিশ্চিত করুন';
+  }
+};
+
+document.getElementById('trxid').addEventListener('keypress', function(e){
+  if(e.key === 'Enter') window.submitPayment();
+});
+amountInput.addEventListener('keypress', function(e){
+  if(e.key === 'Enter') document.getElementById('trxid').focus();
 });
 </script>
 </body>
